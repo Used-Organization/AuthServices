@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServices.API", "AuthServices.API\AuthServices.API.csproj", "{B1E48F99-3E24-415C-B2F6-9D4A2AED0B4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthServices.API", "AuthServices.API\AuthServices.API.csproj", "{B1E48F99-3E24-415C-B2F6-9D4A2AED0B4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServices.Domain", "AuthServices.Domain\AuthServices.Domain.csproj", "{58A55184-0347-4211-A71D-6298530BC42C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServices.Application", "AuthServices.Application\AuthServices.Application.csproj", "{42FEE32E-DCA3-4051-A667-FB71BF0D3A23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServices.Infrastructure", "AuthServices.Infrastructure\AuthServices.Infrastructure.csproj", "{A6B6240E-C79D-44F8-BC91-84D2E1242041}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +21,18 @@ Global
 		{B1E48F99-3E24-415C-B2F6-9D4A2AED0B4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1E48F99-3E24-415C-B2F6-9D4A2AED0B4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1E48F99-3E24-415C-B2F6-9D4A2AED0B4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58A55184-0347-4211-A71D-6298530BC42C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58A55184-0347-4211-A71D-6298530BC42C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58A55184-0347-4211-A71D-6298530BC42C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58A55184-0347-4211-A71D-6298530BC42C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42FEE32E-DCA3-4051-A667-FB71BF0D3A23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42FEE32E-DCA3-4051-A667-FB71BF0D3A23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42FEE32E-DCA3-4051-A667-FB71BF0D3A23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42FEE32E-DCA3-4051-A667-FB71BF0D3A23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6B6240E-C79D-44F8-BC91-84D2E1242041}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6B6240E-C79D-44F8-BC91-84D2E1242041}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6B6240E-C79D-44F8-BC91-84D2E1242041}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6B6240E-C79D-44F8-BC91-84D2E1242041}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
