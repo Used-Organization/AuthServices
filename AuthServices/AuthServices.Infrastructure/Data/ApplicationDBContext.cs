@@ -6,9 +6,6 @@ namespace AuthServices.Infrastructure.Data
 {
     public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDBContext()
-        { }
-
         public ApplicationDBContext(DbContextOptions options) : base(options)
         {
         }
@@ -17,6 +14,15 @@ namespace AuthServices.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            // Configure primary key for RefreshToken
+            modelBuilder.Entity<RefreshToken>()
+                .HasKey(rt => rt.Id);
+
+            // Configure one-to-many relationship between ApplicationUser and RefreshToken
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(rt => rt.UserId);
         }
     }
 }
