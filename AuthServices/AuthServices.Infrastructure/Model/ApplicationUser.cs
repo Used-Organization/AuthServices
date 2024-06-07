@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
 namespace AuthServices.Infrastructure.Model
 {
     public class ApplicationUser : IdentityUser

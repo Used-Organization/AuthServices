@@ -1,4 +1,5 @@
-﻿using AuthServices.Domain.RequestModel;
+﻿using AuthServices.Domain.DTO;
+using AuthServices.Domain.RequestModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -11,14 +12,14 @@ namespace AuthServices.API.Controllers
     {
         // Register endpoint
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] RegisterDTO request)
         {
             throw new NotImplementedException();
         }
 
         // Login endpoint
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginDTO request)
         {
             throw new NotImplementedException();
         }

@@ -1,3 +1,4 @@
+using AuthServices.Domain.Configurations;
 using AuthServices.Infrastructure.Data;
 using AuthServices.Infrastructure.Model;
 using Microsoft.AspNetCore.Identity;
@@ -5,32 +6,26 @@ using Microsoft.EntityFrameworkCore;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var connString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddHttpContextAccessor();
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
-
-
-var connString = builder.Configuration.GetConnectionString("DefaultConnection");
-
 builder.Services.AddDbContext<ApplicationDBContext>(o => o.UseSqlServer(connString));
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDBContext>()
-    .AddDefaultTokenProviders();
-
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDBContext>()
+                .AddDefaultTokenProviders();
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequiredLength = 8;
     options.Password.RequireDigit = true;
     options.Password.RequireNonAlphanumeric = false;
-
     options.Lockout.MaxFailedAccessAttempts = 3;
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
-
     options.SignIn.RequireConfirmedEmail = false;
 });
 
