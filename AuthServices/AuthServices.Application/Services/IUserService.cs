@@ -3,7 +3,7 @@ using AuthServices.Domain.Models;
 
 namespace AuthServices.Application.Services
 {
-    public interface IUserServices
+    public interface IUserService
     {
         Task<Response> GetUserByIdAsync(string userId);
         Task<Response> GetUserByEmailAsync(string email);

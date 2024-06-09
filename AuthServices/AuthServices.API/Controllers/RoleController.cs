@@ -1,6 +1,9 @@
-﻿using AuthServices.Domain.RequestModel;
-using Microsoft.AspNetCore.Http;
+﻿using AuthServices.Application.Services;
+using AuthServices.Domain.Models;
+using AuthServices.Domain.RequestModel;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace AuthServices.API.Controllers
 {
@@ -8,22 +11,49 @@ namespace AuthServices.API.Controllers
     [ApiController]
     public class RoleController : ControllerBase
     {
-        [HttpPost("assign-role")]
-        public async Task<IActionResult> AssignRole([FromBody] AssignRoleRequest request)
+        private readonly IRoleService _roleService;
+        public RoleController(IRoleService roleService)
         {
-            throw new NotImplementedException();
+            _roleService = roleService;
         }
 
-        [HttpPost("remove-role")]
-        public async Task<IActionResult> RemoveRole([FromBody] RemoveRoleRequest request) 
+        [Authorize(Roles = UserRoles.SystemAdmin)]
+        [HttpPost("assign-systemAdmin-role")]
+        public async Task<IActionResult> AssignSystemAdminRole([FromBody] string userId)
         {
-            throw new NotImplementedException();
+            var result = await _roleService.AddSystemAdminRoleAsync(userId);
+            if(result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        [Authorize(Roles = UserRoles.SystemAdmin)]
+        [HttpPost("assign-admin-role")]
+        public async Task<IActionResult> AssignAdminRole([FromBody] string userId)
+        {
+            var result = await _roleService.AddAdminRoleAsync(userId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
+        [Authorize(Roles = UserRoles.SystemAdmin)]
+        [HttpPost("remove-role")]
+        public async Task<IActionResult> RemoveRole([FromBody] string userId, string role) 
+        {
+            var result = await _roleService.RemoveRoleFromUserAsync(userId,role);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
 
         [HttpGet("get-roles")]
-        public async Task<IActionResult> GetUserRoles()
+        public async Task<IActionResult> GetUserRoles(string userId)
         {
-            throw new NotImplementedException();
+            var result = await _roleService.GetUserRolesAsync(userId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
     }
 }

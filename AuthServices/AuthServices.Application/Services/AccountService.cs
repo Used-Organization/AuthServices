@@ -1,17 +1,10 @@
-﻿using AuthServices.Domain.Configurations;
-using AuthServices.Infrastructure.Model;
+﻿using AuthServices.Infrastructure.Model;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Http;
 using AuthServices.Domain.Models;
 using AuthServices.Domain.DTO;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
+using System.Web;
 
 namespace AuthServices.Application.Services
 {
@@ -23,17 +16,24 @@ namespace AuthServices.Application.Services
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ITokenService _tokenService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMailService _mailingService;
         #endregion
 
         #region Construtor
-        public AccountService(IHttpContextAccessor httpContextAccessor, ITokenService tokenService,
-            UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
+        public AccountService(
+            IHttpContextAccessor httpContextAccessor,
+            ITokenService tokenService,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager, 
+            RoleManager<IdentityRole> roleManager,
+            IMailService mailService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
             _httpContextAccessor = httpContextAccessor;
             _tokenService = tokenService;
+            _mailingService = mailService;
         }
         #endregion
 
@@ -124,7 +124,7 @@ namespace AuthServices.Application.Services
                 await _userManager.AddToRoleAsync(user, UserRoles.User);
             if (!result.Succeeded)
                 return new Response { IsSuccess = false, Message = result.ToString() };
-            //await SendRegisterMail(registerDTO.Email); TODO Mailing servies
+            await SendRegisterMail(registerDTO.Email); 
             return new Response { IsSuccess = true };
         }
         public async Task<Response> RevokeTokenAsync(string refreshToken)
@@ -172,7 +172,7 @@ namespace AuthServices.Application.Services
                                             </p>            
                                         </body>
                                     </html>";
-            //await _mailingService.SendEmailAsync(result.Email, "Reset Password Mail!", PasswordMail); //TODO:
+            await _mailingService.SendEmailAsync(result.Email, "Reset Password Mail!", PasswordMail);
             return new Response { IsSuccess = true, Message = "Reset Password Mail Send to your Email." }; ;
         }
         public async Task<Response> ForgetPasswordUpdate(ForgetPasswordDTO forgetPasswordDTO)
@@ -194,6 +194,40 @@ namespace AuthServices.Application.Services
         #endregion
 
         #region HelperMethods
+        private async Task<bool> SendRegisterMail(string email)
+        {
+            var appUser = await _userManager.FindByEmailAsync(email);
+            if (appUser is null)
+                return false;
+            var verificationCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+            string baseUrl = GetBaseUrl();
+            string routePrefix = "api/Auth";
+            string actionRoute = "confirmEmail";
+
+            string url = $"{baseUrl}/{routePrefix}/{actionRoute}?Email={HttpUtility.UrlEncode(appUser.Email)}&verificationCode={HttpUtility.UrlEncode(verificationCode)}";
+            string WelcomeMessage = $@"
+                                    <html>
+                                        <body>
+                                            <h1>Welcome to Virtual Queue!</h1>
+                                            <p>
+                                                <a href=""{url}"">
+                                                    <button style=""background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer;"">
+                                                        Click Here
+                                                    </button>
+                                                </a>
+                                            </p>
+                                        </body>
+                                    </html>";
+            await _mailingService.SendEmailAsync(appUser.Email, "Welcome To Queue System !", WelcomeMessage);
+            return true;
+        }
+        //TODO:base url  must be your gateway url
+        public string GetBaseUrl()
+        {
+            var request = _httpContextAccessor.HttpContext.Request;
+            var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+            return baseUrl;
+        }
         private async Task<Response> RevokeTokensForUser(ApplicationUser user)
         {
             if (user == null)

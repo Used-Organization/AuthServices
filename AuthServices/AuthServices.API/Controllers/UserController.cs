@@ -1,4 +1,6 @@
-﻿using AuthServices.Domain.RequestModel;
+﻿using AuthServices.Application.Services;
+using AuthServices.Domain.DTO;
+using AuthServices.Domain.RequestModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -9,46 +11,51 @@ namespace AuthServices.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        [HttpGet("user-info")]
-        public async Task<IActionResult> GetUserInfo()
+        private readonly IUserService _userServices;
+
+        public UserController(IUserService userServices)
         {
-            throw new NotImplementedException();
+            _userServices = userServices;
         }
 
-        [HttpPut("update-user")]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest request)
+        // Get user by ID endpoint
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserById(string userId)
         {
-            throw new NotImplementedException();
+            var result = await _userServices.GetUserByIdAsync(userId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
 
-        [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        // Get user by email endpoint
+        [HttpGet("email/{email}")]
+        public async Task<IActionResult> GetUserByEmail(string email)
         {
-            throw new NotImplementedException();
+            var result = await _userServices.GetUserByEmailAsync(email);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
 
-        [HttpPost("reset-password-request")]
-        public async Task<IActionResult> ResetPasswordRequest([FromBody] ResetPasswordRequest request)
+        // Update user profile endpoint
+        [HttpPut("{userId}")]
+        public async Task<IActionResult> UpdateUserProfile(string userId, [FromBody] UpdateUserDTO updateUserDTO)
         {
-            throw new NotImplementedException();
+            var result = await _userServices.UpdateUserProfileAsync(userId, updateUserDTO);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
 
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        // Delete user endpoint
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> DeleteUser(string userId)
         {
-            throw new NotImplementedException();
-        }
-
-        [HttpPost("verify-email")]
-        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
-        {
-            throw new NotImplementedException();
-        }
-
-        [HttpPost("resend-verification-email")]
-        public async Task<IActionResult> ResendVerificationEmail([FromBody] ResendVerificationEmailRequest request)
-        {
-            throw new NotImplementedException();
+            var result = await _userServices.DeleteUserAsync(userId);
+            if (result.IsSuccess)
+                return Ok(result);
+            return BadRequest(result);
         }
     }
 }

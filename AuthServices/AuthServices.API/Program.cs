@@ -1,3 +1,4 @@
+using AuthServices.Application.Services;
 using AuthServices.Domain.Configurations;
 using AuthServices.Infrastructure.Data;
 using AuthServices.Infrastructure.Model;
@@ -9,6 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 var connString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
+builder.Services.Configure<MailSetting>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddTransient<IMailService, MailService>();
 // Add services to the container.
 
 builder.Services.AddControllers();

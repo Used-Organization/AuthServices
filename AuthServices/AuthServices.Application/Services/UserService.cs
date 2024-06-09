@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace AuthServices.Application.Services
 {
-    public class UserService : IUserServices
+    public class UserService : IUserService
     {
         #region Member
         private readonly UserManager<ApplicationUser> _userManager;

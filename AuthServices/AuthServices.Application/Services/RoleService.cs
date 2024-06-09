@@ -23,7 +23,16 @@ namespace AuthServices.Application.Services
         public async Task<Response> AddAdminRoleAsync(string userId) => await AddRoleAsync( userId,UserRoles.Admin);
         public async Task<Response> AddSystemAdminRoleAsync(string userId) => await AddRoleAsync(userId, UserRoles.SystemAdmin);
         public async Task<Response> AddUserRoleAsync(string userId) => await AddRoleAsync(userId, UserRoles.User);
-
+        public async Task<Response> GetUserRolesAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new Response { IsSuccess = false, Message = "User not found." };
+            }
+            var roles = await _userManager.GetRolesAsync(user);
+            return new Response { IsSuccess = true, Message = "User roles retrieved successfully.", Result = roles };
+        }
         public async Task<Response> RemoveRoleFromUserAsync(string userId, string roleName)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -41,7 +50,6 @@ namespace AuthServices.Application.Services
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
             return new Response { IsSuccess = false, Message = $"Error removing role from user: {errors}" };
         }
-
         private async Task<Response> AddRoleAsync(string userId, string role)
         {
             var user = await _userManager.FindByIdAsync(userId);

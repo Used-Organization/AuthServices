@@ -7,6 +7,7 @@ namespace AuthServices.Application.Services
         Task<Response> AddSystemAdminRoleAsync(string userId);
         Task<Response> AddAdminRoleAsync(string userId);
         Task<Response> AddUserRoleAsync(string userId);
+        Task<Response> GetUserRolesAsync(string userId);
         Task<Response> RemoveRoleFromUserAsync(string userId, string roleName);
     }
 }
