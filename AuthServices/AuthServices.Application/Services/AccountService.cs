@@ -115,9 +115,12 @@ namespace AuthServices.Application.Services
                 return new Response { IsSuccess = false, Message = "Email is already registered!" };
             var user = new ApplicationUser
             {
+                FirstName = registerDTO.FirstName,
+                LastName = registerDTO.LastName,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = registerDTO.FirstName + registerDTO.LastName,
+                UserName = registerDTO.FirstName +"_"+ registerDTO.FirstName,
                 Email = registerDTO.Email,
+                CreatedByIp = GetIpAddress() 
             };
             var result = await _userManager.CreateAsync(user, registerDTO.Password);
             if (result.Succeeded && await _roleManager.RoleExistsAsync(UserRoles.User))     
