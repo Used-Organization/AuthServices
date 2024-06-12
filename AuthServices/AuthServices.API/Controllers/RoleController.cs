@@ -1,9 +1,7 @@
 ﻿using AuthServices.Application.Services;
 using AuthServices.Domain.Models;
-using AuthServices.Domain.RequestModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 
 namespace AuthServices.API.Controllers
 {

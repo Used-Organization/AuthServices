@@ -1,8 +1,5 @@
 ﻿using AuthServices.Application.Services;
 using AuthServices.Domain.DTO;
-using AuthServices.Domain.RequestModel;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthServices.API.Controllers
@@ -18,7 +15,6 @@ namespace AuthServices.API.Controllers
             _userServices = userServices;
         }
 
-        // Get user by ID endpoint
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUserById(string userId)
         {
@@ -28,7 +24,6 @@ namespace AuthServices.API.Controllers
             return BadRequest(result);
         }
 
-        // Get user by email endpoint
         [HttpGet("email/{email}")]
         public async Task<IActionResult> GetUserByEmail(string email)
         {
@@ -38,7 +33,6 @@ namespace AuthServices.API.Controllers
             return BadRequest(result);
         }
 
-        // Update user profile endpoint
         [HttpPut("{userId}")]
         public async Task<IActionResult> UpdateUserProfile(string userId, [FromBody] UpdateUserDTO updateUserDTO)
         {
@@ -48,7 +42,6 @@ namespace AuthServices.API.Controllers
             return BadRequest(result);
         }
 
-        // Delete user endpoint
         [HttpDelete("{userId}")]
         public async Task<IActionResult> DeleteUser(string userId)
         {

@@ -1,8 +1,5 @@
 ﻿using AuthServices.Application.Services;
 using AuthServices.Domain.DTO;
-using AuthServices.Domain.RequestModel;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthServices.API.Controllers

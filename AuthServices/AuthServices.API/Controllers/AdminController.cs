@@ -1,6 +1,4 @@
-﻿using AuthServices.Domain.RequestModel;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace AuthServices.API.Controllers
 {
@@ -32,11 +30,11 @@ namespace AuthServices.API.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpPost("create-role")]
-        public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest request)
-        {
-            throw new NotImplementedException();
-        }
+        //[HttpPost("create-role")]
+        //public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest request)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         [HttpDelete("delete-role/{roleName}")]
         public async Task<IActionResult> DeleteRole(string roleName)
