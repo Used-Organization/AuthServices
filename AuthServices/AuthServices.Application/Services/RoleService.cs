@@ -28,10 +28,10 @@ namespace AuthServices.Application.Services
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new Response { IsSuccess = false, Message = "User not found." };
+                return new RolesResponse { IsSuccess = false, Message = "User not found." };
             }
             var roles = await _userManager.GetRolesAsync(user);
-            return new Response { IsSuccess = true, Message = "User roles retrieved successfully.", Result = roles };
+            return new RolesResponse { IsSuccess = true, Message = "User roles retrieved successfully.", Result = roles.ToList() };
         }
         public async Task<Response> RemoveRoleFromUserAsync(string userId, string roleName)
         {

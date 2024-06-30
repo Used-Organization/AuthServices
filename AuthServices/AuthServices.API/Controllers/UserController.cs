@@ -1,10 +1,13 @@
 ﻿using AuthServices.Application.Services;
 using AuthServices.Domain.DTO;
+using AuthServices.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AuthServices.API.Controllers
 {
     [Route("api/auth/user")]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.SystemAdmin}")]
     [ApiController]
     public class UserController : ControllerBase
     {

@@ -42,8 +42,11 @@ namespace AuthServices.Application.Services
                 Token = refreshToken,
                 Expires = DateTime.UtcNow.AddDays(_jwt.RefreshTokenValidityInDays),
                 CreatedByIp = GetIpAddress(),
-                CreatedOn = DateTime.UtcNow
+                CreatedOn = DateTime.UtcNow,
+                ReplacedByToken="",
             };
+            if (user.RefreshTokens == null)
+                user.RefreshTokens = new List<RefreshToken>();
             user.RefreshTokens.Add(newRefreshToken);
             user.RefreshTokens.RemoveAll(rt => rt.IsExpired || rt.Revoked != null);
 

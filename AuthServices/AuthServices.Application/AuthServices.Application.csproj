@@ -16,4 +16,8 @@
     <ProjectReference Include="..\AuthServices.Infrastructure\AuthServices.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+
 </Project>

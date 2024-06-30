@@ -1,4 +1,5 @@
-﻿using AuthServices.Application.Services;
+﻿using AuthServices.API.Helpers;
+using AuthServices.Application.Services;
 using AuthServices.Domain.DTO;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +10,12 @@ namespace AuthServices.API.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
+        private readonly CookiesHelper _cookiesHelper;
 
         public AccountController(IAccountService accountService)
         {
             _accountService = accountService;
+            _cookiesHelper = new CookiesHelper();
         }
 
         // Register endpoint
@@ -31,25 +34,23 @@ namespace AuthServices.API.Controllers
         {
             var result = await _accountService.LoginAsync(request);
             if (result.IsSuccess)
+            {
+                var authDTO = (AuthDTO)result.Result;
+                if (authDTO != null && authDTO is AuthDTO)
+                {
+                    _cookiesHelper.SetAccessToken(Response, authDTO.AccessToken, authDTO.AccessTokenExpiration);
+                    _cookiesHelper.SetRefreshTokenInCookie(Response, authDTO.RefreshToken, authDTO.RefreshTokenExpiration);
+                }
                 return Ok(result);
-            return BadRequest(result);
-        }
-
-        // Logout endpoint
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
-        {
-            var result = await _accountService.LogoutAsync();
-            if (result.IsSuccess)
-                return Ok(result);
+            }
             return BadRequest(result);
         }
 
         // Confirm email endpoint
-        [HttpPost("confirm-email")]
-        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDTO request)
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail(string Email, string verificationCode)
         {
-            var result = await _accountService.ConfirmRegisterEmailAsync(request.Email, request.Code);
+            var result = await _accountService.ConfirmRegisterEmailAsync(Email, verificationCode);
             if (result.IsSuccess)
                 return Ok(result);
             return BadRequest(result);
@@ -57,17 +58,25 @@ namespace AuthServices.API.Controllers
 
         // Refresh token endpoint
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] string token)
+        public async Task<IActionResult> RefreshToken(string token)
         {
             var result = await _accountService.RefreshTokenAsync(token);
             if (result.IsSuccess)
+            {
+                var authDTO = (AuthDTO)result.Result;
+                if (authDTO != null && authDTO is AuthDTO)
+                {
+                    _cookiesHelper.SetAccessToken(Response, authDTO.AccessToken, authDTO.AccessTokenExpiration);
+                    _cookiesHelper.SetRefreshTokenInCookie(Response, authDTO.RefreshToken, authDTO.RefreshTokenExpiration);
+                }
                 return Ok(result);
+            }
             return BadRequest(result);
         }
 
         // Revoke token endpoint
         [HttpPost("revoke-token")]
-        public async Task<IActionResult> RevokeToken([FromBody] string token)
+        public async Task<IActionResult> RevokeToken(string token)
         {
             var result = await _accountService.RevokeTokenAsync(token);
             if (result.IsSuccess)
@@ -77,7 +86,7 @@ namespace AuthServices.API.Controllers
 
         // Revoke token by user ID endpoint
         [HttpPost("revoke-token-by-id")]
-        public async Task<IActionResult> RevokeTokenById([FromBody] string userId)
+        public async Task<IActionResult> RevokeTokenById(string userId)
         {
             var result = await _accountService.RevokeUserTokenByIdAsync(userId);
             if (result.IsSuccess)
@@ -87,7 +96,7 @@ namespace AuthServices.API.Controllers
 
         // Revoke token by user email endpoint
         [HttpPost("revoke-token-by-email")]
-        public async Task<IActionResult> RevokeTokenByEmail([FromBody] string email)
+        public async Task<IActionResult> RevokeTokenByEmail(string email)
         {
             var result = await _accountService.RevokeUserTokenByEmailAsync(email);
             if (result.IsSuccess)
@@ -107,7 +116,7 @@ namespace AuthServices.API.Controllers
 
         // Forget password email endpoint
         [HttpPost("forget-password-email")]
-        public async Task<IActionResult> ForgetPasswordEmail([FromBody] string email)
+        public async Task<IActionResult> ForgetPasswordEmail(string email)
         {
             var result = await _accountService.ForgetPasswordEmail(email);
             if (result.IsSuccess)
@@ -117,8 +126,9 @@ namespace AuthServices.API.Controllers
 
         // Forget password update endpoint
         [HttpPost("forget-password-update")]
-        public async Task<IActionResult> ForgetPasswordUpdate([FromBody] ForgetPasswordDTO request)
+        public async Task<IActionResult> ForgetPasswordUpdate(string Email, string Password, string VerificationCode)
         {
+            ForgetPasswordDTO request= new ForgetPasswordDTO(Email, Password, VerificationCode);
             var result = await _accountService.ForgetPasswordUpdate(request);
             if (result.IsSuccess)
                 return Ok(result);

@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AuthServices.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AuthServices.API.Controllers
 {
     [Route("api/auth/admin")]
+    [Authorize(Roles = $"{UserRoles.Admin},{UserRoles.SystemAdmin}")]
     [ApiController]
     public class AdminController : ControllerBase
     {
@@ -29,12 +32,6 @@ namespace AuthServices.API.Controllers
         {
             throw new NotImplementedException();
         }
-
-        //[HttpPost("create-role")]
-        //public async Task<IActionResult> CreateRole([FromBody] CreateRoleRequest request)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         [HttpDelete("delete-role/{roleName}")]
         public async Task<IActionResult> DeleteRole(string roleName)

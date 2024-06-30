@@ -10,8 +10,8 @@ namespace AuthServices.Infrastructure.Model
         public DateTime? Revoked { get; set; }
         public DateTime CreatedOn { get; set; }
         public string CreatedByIp { get; set; }
-        public string RevokedByIp { get; set; }
-        public string ReplacedByToken { get; set; }
+        public string? RevokedByIp { get; set; }
+        public string? ReplacedByToken { get; set; }
         public bool IsActive => Revoked == null && !IsExpired;
         public bool IsExpired => DateTime.UtcNow >= Expires;
 

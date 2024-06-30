@@ -38,28 +38,28 @@ namespace AuthServices.Application.Services
         #endregion
 
         #region Methods
-        public async Task<Response> ConfirmRegisterEmailAsync(string email, string code)
+        public async Task<AuthResponse> ConfirmRegisterEmailAsync(string email, string code)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                return new Response { Message = "Email not  registered!", IsSuccess = false };
+                return new AuthResponse { Message = "Email not  registered!", IsSuccess = false };
             var result = await _userManager.ConfirmEmailAsync(user, code);
             if (!result.Succeeded)
-                return new Response { Message = result.ToString(), IsSuccess = false };
+                return new AuthResponse { Message = result.ToString(), IsSuccess = false };
             var authDto = await _tokenService.CreateAuthenticationTokens(user);
-            return new Response
+            return new AuthResponse
             {
                 Message = authDto.Message,
                 IsSuccess=authDto.IsAuthenticated,
                 Result=authDto
             };
         }
-        public async Task<Response> LoginAsync(LoginDTO loginDTO)
+        public async Task<AuthResponse> LoginAsync(LoginDTO loginDTO)
         {
             var user = await _userManager.FindByEmailAsync(loginDTO.Email);
             if (user == null)
             {
-                return new Response
+                return new AuthResponse
                 {
                     IsSuccess = false,
                     Message = "Invalid email or password."
@@ -68,7 +68,7 @@ namespace AuthServices.Application.Services
 
             if (!user.EmailConfirmed)
             {
-                return new Response
+                return new AuthResponse
                 {
                     IsSuccess = false,
                     Message = "Email is not confirmed. Please confirm your email first."
@@ -78,7 +78,7 @@ namespace AuthServices.Application.Services
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDTO.Password, false);
             if (!result.Succeeded)
             {
-                return new Response
+                return new AuthResponse
                 {
                     IsSuccess = false,
                     Message = "Invalid email or password."
@@ -87,7 +87,7 @@ namespace AuthServices.Application.Services
 
             var authDTO = await _tokenService.CreateAuthenticationTokens(user);
 
-            return new Response
+            return new AuthResponse
             {
                 IsSuccess = authDTO.IsAuthenticated,
                 Message = authDTO.Message,
@@ -99,10 +99,10 @@ namespace AuthServices.Application.Services
             await _signInManager.SignOutAsync();
             return new Response { IsSuccess = false, Message = "Logout Success !" };
         }
-        public async Task<Response> RefreshTokenAsync(string token)
+        public async Task<AuthResponse> RefreshTokenAsync(string token)
         {
             var authDto= await _tokenService.CreateAccessToken(token);
-            return new Response
+            return new AuthResponse
             {
                 IsSuccess = authDto.IsAuthenticated,
                 Result = authDto,
@@ -118,15 +118,20 @@ namespace AuthServices.Application.Services
                 FirstName = registerDTO.FirstName,
                 LastName = registerDTO.LastName,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = registerDTO.FirstName +"_"+ registerDTO.FirstName,
+                UserName = registerDTO.Email,
                 Email = registerDTO.Email,
                 CreatedByIp = GetIpAddress() 
             };
             var result = await _userManager.CreateAsync(user, registerDTO.Password);
-            if (result.Succeeded && await _roleManager.RoleExistsAsync(UserRoles.User))     
-                await _userManager.AddToRoleAsync(user, UserRoles.User);
             if (!result.Succeeded)
                 return new Response { IsSuccess = false, Message = result.ToString() };
+            bool roleExsit = await _roleManager.RoleExistsAsync(UserRoles.User);
+            if (!roleExsit)
+                await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+            result = await _userManager.AddToRoleAsync(user, UserRoles.User);
+            if (!result.Succeeded)
+                return new Response { IsSuccess = false, Message = result.ToString() };
+            
             await SendRegisterMail(registerDTO.Email); 
             return new Response { IsSuccess = true };
         }
@@ -160,18 +165,17 @@ namespace AuthServices.Application.Services
             if (result == null)
                 return new Response { IsSuccess = false, Message = "Email is not found" };
             var token = await _userManager.GeneratePasswordResetTokenAsync(result);
-            string url = $"http://localhost:3000/resetpassword?t={token}&u={Email}";
+            //string baseUrl = GetBaseUrl();
+            //string routePrefix = "api/auth/account";
+            //string actionRoute = "confirm-email";
+            //string url = $"{baseUrl}/{routePrefix}/{actionRoute}?Email={HttpUtility.UrlEncode(appUser.Email)}&verificationCode={HttpUtility.UrlEncode(verificationCode)}";
             string PasswordMail = $@"
                                     <html>
                                         <body>
                                             <h1>Attention!</h1>
-                                            <p>Please keep it secret and don't share it with anyone.</p>
+                                            <p>Reset code {token} Please keep it secret and don't share it with anyone.</p>
                                             <p>
-                                                <a href=""{url}"">
-                                                    <button style=""background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer;"">
-                                                        Click Here
-                                                    </button>
-                                                </a>
+                                                
                                             </p>            
                                         </body>
                                     </html>";
@@ -204,14 +208,14 @@ namespace AuthServices.Application.Services
                 return false;
             var verificationCode = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
             string baseUrl = GetBaseUrl();
-            string routePrefix = "api/Auth";
-            string actionRoute = "confirmEmail";
+            string routePrefix = "api/auth/account";
+            string actionRoute = "confirm-email";
 
             string url = $"{baseUrl}/{routePrefix}/{actionRoute}?Email={HttpUtility.UrlEncode(appUser.Email)}&verificationCode={HttpUtility.UrlEncode(verificationCode)}";
             string WelcomeMessage = $@"
                                     <html>
                                         <body>
-                                            <h1>Welcome to Virtual Queue!</h1>
+                                            <h1>Welcome to Book Store!</h1>
                                             <p>
                                                 <a href=""{url}"">
                                                     <button style=""background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer;"">
