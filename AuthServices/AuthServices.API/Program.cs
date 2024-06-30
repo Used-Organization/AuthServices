@@ -29,5 +29,6 @@ app.MapControllers();
 
 // Apply pending migrations
 app.ApplyMigration();
+app.AddTestingAdminUser();
 
 app.Run();
